@@ -1,0 +1,39 @@
+volatile int timer_counter;
+
+int led1 = 9;
+int led2 = 8;
+int toggle=1;
+
+void StartingInterrTime(int freq) {
+	noInterrupts(); 
+	TCCR1A = 0;
+	TCCR1B = 0;
+  
+    timer_counter = 62500/freq;
+    TCNT1 = timer_counter;
+    TCCR1B |= (1 << CS12);
+    TIMSK1 |= (1 <<TOIE1);
+    interrupts();
+}
+
+void setup()
+{
+	pinMode(led1 , OUTPUT);
+  	pinMode(led2 , OUTPUT);
+  	StartingInterrTime(2);
+}
+
+ISR(TIMER1_OVF_vect)
+{
+TCNT1 = timer_counter;
+digitalWrite(led2, toggle);
+toggle =!toggle;
+}
+
+void loop()
+{
+ digitalWrite(led1 , HIGH);
+ delay(200);
+  digitalWrite(led1 , LOW);
+  delay(200);
+}
